@@ -1,6 +1,6 @@
 #ifndef WAVLTREE_H
 #define WAVLTREE_H
-
+//#include <iostream>
 
 // explanations for public member functions are provided in project2.h
 // each file that uses a WAVL tree should #include this file 
@@ -33,8 +33,12 @@ class WAVLTree {
 		// define new private members
     int count = 0;
     void destroy_tree(node* leaf);
-    void insert_key(node* leaf, KeyType key, ValType val);
+    void insert_node(node* leaf, node* newNode);
     void balance_tree(node* leaf);
+    void left_rotation(node* leaf);
+    void right_rotation(node* leaf);
+    void rl_rotation(node* leaf);
+    void lr_rotation(node* leaf);
 };
 
 // fill in the definitions for each public member function and for any additional public/private members you define
@@ -56,8 +60,17 @@ WAVLTree<KeyType, ValType>::~WAVLTree()
 template <typename KeyType, typename ValType>
 void WAVLTree<KeyType, ValType>::insert(KeyType key, ValType val)
 {
-  insert_key(root, key, val);
+  // create the new node to insert
+  node* newNode = new node;
+  newNode->k = key;
+  newNode->v = val;
+  newNode->rank = 1;
   this->count++;
+
+  if (!root)
+    root = newNode;
+  else
+    insert_node(root, newNode);
 }
 
 template <typename KeyType, typename ValType>
@@ -109,7 +122,7 @@ int WAVLTree<KeyType, ValType>::getRank(const KeyType& key)
 template <typename KeyType, typename ValType>
 void WAVLTree<KeyType, ValType>::destroy_tree(node* leaf)
 {
-  if (leaf != nullptr)
+  if (leaf)
   {
     destroy_tree(leaf->left);
     destroy_tree(leaf->right);
@@ -118,47 +131,27 @@ void WAVLTree<KeyType, ValType>::destroy_tree(node* leaf)
 }
 
 template <typename KeyType, typename ValType>
-void WAVLTree<KeyType, ValType>::insert_key(node* leaf, KeyType key, ValType val)
+void WAVLTree<KeyType, ValType>::insert_node(node* leaf, node* newNode)
 {
-  // if it's the first element to be added into the tree
-  if (root == nullptr)
+  if (leaf->k < newNode->k)
   {
-    node* newNode = new node;
-    newNode->k = key;
-    newNode->v = val;
-    newNode->rank = 1;
-    root = newNode;
-    return;
-  }
-
-  // insert the new node at the external node
-  if (leaf->k < key)
-  {
-    if (leaf->right == nullptr)
+    if (!leaf->right)
     {
-      node* newNode = new node;
-      newNode->k = key;
-      newNode->v = val;
-      newNode->rank = 1;
       leaf->right = newNode;
       newNode->parent = leaf;
     }
     else
-      insert_key(leaf->right, key, val);
+      insert_node(leaf->right, newNode);
   }
   else
   {
-    if (leaf->left == nullptr)
+    if (!leaf->left)
     {
-      node* newNode = new node;
-      newNode->k = key;
-      newNode->v = val;
-      newNode->rank = 1;
       leaf->left = newNode;
       newNode->parent = leaf;
     }
     else
-      insert_key(leaf->left, key, val);
+      insert_node(leaf->left, newNode);
   }
   balance_tree(leaf);
 }
@@ -172,10 +165,10 @@ void WAVLTree<KeyType, ValType>::balance_tree(node* leaf)
   node* lnode = leaf->left;
   node* rnode = leaf->right;
 
-  if (rnode != nullptr && leaf->rank == rnode->rank)
+  if (rnode && leaf->rank == rnode->rank)
   {
     int l_diff;
-    if (lnode == nullptr)
+    if (!lnode)
       l_diff = leaf->rank;
     else
       l_diff = leaf->rank - lnode->rank;
@@ -183,80 +176,41 @@ void WAVLTree<KeyType, ValType>::balance_tree(node* leaf)
     if (l_diff > 1)
     {
       int r_r_rank, r_l_rank;
-      if (rnode->right != nullptr)
+      if (rnode->right)
         r_r_rank = rnode->right->rank;
       else
         r_r_rank = 0;
-      if (rnode->left != nullptr)
+      if (rnode->left)
         r_l_rank = rnode->left->rank;
       else
         r_l_rank = 0;
 
-      // [1] rnode == 2,1-node
+      // [1] single rotation (2,1-node)
       if (rnode->rank - r_l_rank > 1)
       {
-        // left rotation
-        leaf->right = rnode->left;
-        leaf->rank -= 1;
-        rnode->left = leaf;
-        rnode->parent = leaf->parent;
-        leaf->parent->left = rnode;
-        leaf->parent = rnode;
-
-        if (leaf == root)
-          root = rnode;
+        //std::cout << "LEFT" << std::endl;
+        left_rotation(leaf);
       }
-
-      // [2] rnode == 1,2-node
-      else if (rnode->rank - r_r_rank > 1)
-      {
-        node* rlnode = rnode->left;
-        // right-left
-        rnode->left = rlnode->right;
-        rnode->rank -= 1;
-        rlnode->rank += 1;
-        rlnode->parent = leaf;
-        rlnode->right = rnode;
-        leaf->right = rlnode;
-        rnode->parent = rlnode;
-
-        leaf->right = rlnode->left;
-        leaf->rank -= 1;
-        rlnode->left = leaf;
-        rlnode->parent = leaf->parent;
-        if (leaf != root)
-          leaf->parent->left = rlnode;
-        else
-          root = rlnode;
-        leaf->parent = rlnode;
-          
+        
+      // [2] double rotation (1,2-node)
+      else {
+        //std::cout << "RL" << std::endl;
+        rl_rotation(leaf);
       }
-
-      // [3] rnode == 1,1-node
-      else
-      {
-        leaf->right = rnode->left;
-        rnode->left->parent = leaf;
-        rnode->left = leaf;
-        rnode->parent = leaf->parent;
-        rnode->rank += 1;
-        if (leaf == root)
-          root = rnode;
-        else
-          leaf->parent->right = rnode;
-        leaf->parent = rnode;
-      }
+        
     }
-
     else
+    {
+      //std::cout << "ADD RANK" << std::endl;
       leaf->rank += 1;
-
+    }
+      
   }
 
-  if (lnode != nullptr && leaf->rank == lnode->rank)
+  if (lnode && leaf->rank == lnode->rank)
   {
     int r_diff;
-    if (rnode == nullptr)
+    if (!rnode)
       r_diff = leaf->rank;
     else
       r_diff = leaf->rank - rnode->rank;
@@ -265,70 +219,123 @@ void WAVLTree<KeyType, ValType>::balance_tree(node* leaf)
     if (r_diff > 1)
     {
       int l_r_rank, l_l_rank;
-      if (lnode->right != nullptr)
+      if (lnode->right)
         l_r_rank = lnode->right->rank;
       else
         l_r_rank = 0;
-      if (lnode->left != nullptr)
+      if (lnode->left)
         l_l_rank = lnode->left->rank;
       else
         l_l_rank = 0;
 
-      // [1] lnode == 1,2-node
+      // [1] single rotation (1,2-node)
       if (lnode->rank - l_r_rank > 1)
       {
-        leaf->left = lnode->right;
-        leaf->rank -= 1;
-        lnode->right = leaf;
-        lnode->parent = leaf->parent;
-        leaf->parent->right = lnode;
-        leaf->parent = lnode;
-        if (leaf == root)
-          root = lnode;
+        //std::cout << "RIGHT" << std::endl;
+        right_rotation(leaf);
       }
-
-      // [2] lnode == 2,1-node
-      else if (lnode->rank - l_l_rank > 1)
-      {
-        node* lrnode = lnode->right;
-        // left-right
-        lnode->right = lrnode->left;
-        lnode->rank -= 1;
-        lrnode->rank += 1;
-        lrnode->parent = leaf;
-        lrnode->left = lnode;
-        leaf->left = lrnode;
-        lnode->parent = lrnode;
-
-        leaf->left = lrnode->right;
-        leaf->rank -= 1;
-        lrnode->right = leaf;
-        lrnode->parent = leaf->parent;
-        if (leaf != root)
-          leaf->parent->right = lrnode;
-        else
-          root = lrnode;
-        leaf->parent = lrnode;
-      }
-
-      // [3] lnode == 1,1-node
+        
+      // [2] double rotation (2,1-node)
       else
       {
-        leaf->left = lnode->right;
-        lnode->right->parent = leaf;
-        lnode->right = leaf;
-        lnode->parent = leaf->parent;
-        lnode->rank += 1;
-        if (leaf == root)
-          root = lnode;
-        else
-          leaf->parent->left = lnode;
-        leaf->parent = lnode;
+        //std::cout << "LR" << std::endl;
+        lr_rotation(leaf);
       }
+        
     }
     else
+    {
+      //std::cout << "ADD RANK" << std::endl;
       leaf->rank += 1;
+    }
   }
 }
+
+template<typename KeyType, typename ValType>
+void WAVLTree<KeyType, ValType>::left_rotation(node* leaf)
+{
+  //std::cout << leaf->k <<"\t" << leaf->right->k << std::endl;
+  node* rnode = leaf->right;
+  if (leaf->parent)
+  {
+    //std::cout << leaf->k <<"'s parent: " << leaf->parent->k << std::endl;
+    if (leaf->parent->left == leaf)
+      leaf->parent->left = rnode;
+    else
+      leaf->parent->right = rnode;
+    rnode->parent = leaf->parent;
+  }
+
+  leaf->right = rnode->left;
+  if (rnode->left) rnode->left->parent = leaf;
+  leaf->rank -= 1;
+  leaf->parent = rnode;
+  rnode->left = leaf;
+  if (leaf == root)
+  {
+    root = rnode;
+    root->parent = nullptr;
+  }
+    
+}
+
+template<typename KeyType, typename ValType>
+void WAVLTree<KeyType, ValType>::right_rotation(node* leaf)
+{
+  node* lnode = leaf->left;
+  if (leaf->parent)
+  {
+    //std::cout << leaf->k << "'s parent: " << leaf->parent->k << std::endl;
+    if (leaf->parent->right == leaf)
+      leaf->parent->right = lnode;
+    else
+      leaf->parent->left = lnode;
+    lnode->parent = leaf->parent;
+  }
+
+  leaf->left = lnode->right;
+  if (lnode->right) lnode->right->parent = leaf;
+  leaf->rank -= 1;
+  leaf->parent = lnode;
+  lnode->right = leaf;
+  if (leaf == root)
+  {
+    root = lnode;
+    root->parent = nullptr;
+  }
+}
+
+template<typename KeyType, typename ValType>
+void WAVLTree<KeyType, ValType>::rl_rotation(node* leaf)
+{
+  node* cnode = leaf->right;
+  node* bnode = cnode->left;
+  cnode->rank -= 1;
+  bnode->rank += 1;
+  cnode->left = bnode->right;
+  if (bnode->right) bnode->right->parent = cnode;
+  bnode->right = cnode;
+  cnode->parent = bnode;
+  bnode->parent = leaf;
+  leaf->right = bnode;
+  left_rotation(leaf);
+}
+
+template<typename KeyType, typename ValType>
+void WAVLTree<KeyType, ValType>::lr_rotation(node* leaf)
+{
+  node* cnode = leaf->left;
+  node* bnode = cnode->right;
+  cnode->rank -= 1;
+  bnode->rank += 1;
+  cnode->right = bnode->left;
+  if (bnode->left) bnode->left->parent = cnode;
+  bnode->left = cnode;
+  cnode->parent = bnode;
+  bnode->parent = leaf;
+  leaf->left = bnode;
+  right_rotation(leaf);
+}
+
 
 #endif /* WAVLTREE_H */
