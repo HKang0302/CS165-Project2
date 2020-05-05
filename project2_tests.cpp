@@ -84,19 +84,38 @@ int main()
 	// WAVLTree tests
 	// ------------------
 	std::cout << std::endl;
-	std::cout << "testing WAVLTree" << std::endl; 
+	std::cout << "testing WAVLTree (given)" << std::endl;
+  // define key/value pairs
+  WAVLTree<int, char> tree1;
+  std::vector<std::pair <int, char> > data1 = { {4, 'a'}, {5, 'b'}, {2, 'c'}, {1, 'd'} };
+  initializeTreeWithData(tree1, data1);
+  std::cout << "find(4): " << tree1.find(4) << ", Expected: a" << std::endl;
+  std::cout << "getSize(): " << tree1.getSize() << ", Expected: 4" << std::endl;
+  std::cout << "getHeight(): " << tree1.getHeight() << ", Expected: 3" << std::endl;
+  std::cout << "getRank(2): " << tree1.getRank(2) << ", Expected: 2" << std::endl;
+  std::cout << "getRank(1): " << tree1.getRank(1) << ", Expected: 1" << std::endl;
+  tree1.insert(0, 'e'); // single rotation
+  std::cout << "getSize(): " << tree1.getSize() << ", Expected: 5" << std::endl;
+  std::cout << "getHeight(): " << tree1.getHeight() << ", Expected: 3" << std::endl;
+  std::cout << "getRank(2): " << tree1.getRank(2) << ", Expected: 1" << std::endl;
+  std::cout << "getRank(1): " << tree1.getRank(1) << ", Expected: 2" << std::endl;
+  // add new tests
 
 	// define key/value pairs
+  std::cout << std::endl;
+  std::cout << "testing WAVLTree (print)" << std::endl;
 	WAVLTree<int, char> tree;
 	std::vector<std::pair <int, char> > data = {{1, 'a'}, {2, 'b'}, {8, 'c'}, {4, 'd'},{3, 'a'},{6, 'a'} ,{9, 'a'} ,{5, 'a'} };
 	//initializeTreeWithData(tree, data);
   for (auto const& item : data) {
-    std::cout << "===================" << item.first << "(PROCESS)===========================" << std::endl;
+    //std::cout << "===================" << item.first << "===========================" << std::endl;
     tree.insert(item.first, item.second);    
-    print_tree(tree.root);
+    //print_tree(tree.root);
     //std::cout << "===================" << item.first << "(PARENTS)===========================" << std::endl;
     //print_parents(tree.root);
   }
+  std::cout << "=====================<FINAL>===========================" << std::endl;
+  print_tree(tree.root);
   std::cout << "==================================================" << std::endl;
   
 	// add new tests
@@ -110,18 +129,18 @@ int main()
 	std::cout << "test 1" << std::endl; 
 	
 	// define list of items 
-	std::vector<double> items {0.1, 0.8, 0.3, 0.5, 0.7, 0.2, 0.6, 0.4};
+  std::vector<double> items{ 0.5, 0.2, 0.7, 0.5, 0.3, 0.4, 0.2, 0.5, 0.8, 0.1, 0.2, 0.3 };
 	std::vector<int> assignments(items.size(), 0);
 	std::vector<double> free_space;
 	ProblemInstance test1 = {items, assignments, free_space}, expected_result;
 	
 	// next_fit
-	expected_result = {items, {1, 1, 2, 2, 3, 3, 4, 4}, {0.1, 0.2, 0.1, 0.0}};
+	expected_result = {items, {1, 1, 2, 3, 3, 4, 4, 5, 6, 6, 7, 7}, {0.3, 0.3, 0.2, 0.4, 0.5, 0.1, 0.5}};
 	testAlgorithm(test1, expected_result, next_fit, "next_fit"); 
 
 	// first_fit
-	//expected_result = {items, {1, 1, 2, 2, 3, 2, 4, 4}, {0.1, 0.0, 0.3, 0.0}};
-	//testAlgorithm(test1, expected_result, first_fit, "first_fit"); 
+	expected_result = {items, {1, 1, 2, 3, 1, 3, 2, 4, 5, 2, 4, 4}, {0.0, 0.0, 0.1, 0.0, 0.2}};
+	testAlgorithm(test1, expected_result, first_fit, "first_fit"); 
 
 	// first_fit_decreasing
 	//expected_result = {items, {1, 2, 3, 4, 3, 2, 1, 4}, {0.0, 0.0, 0.0, 0.4}};

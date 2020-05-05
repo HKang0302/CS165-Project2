@@ -1,6 +1,6 @@
 #ifndef WAVLTREE_H
 #define WAVLTREE_H
-//#include <iostream>
+#include <iostream>
 
 // explanations for public member functions are provided in project2.h
 // each file that uses a WAVL tree should #include this file 
@@ -28,6 +28,8 @@ class WAVLTree {
       node* parent = nullptr;
     };
     node* root;
+    auto find_node(const KeyType& key);
+    void setValue(KeyType key, const ValType val);
 
 	private:
 		// define new private members
@@ -76,18 +78,11 @@ void WAVLTree<KeyType, ValType>::insert(KeyType key, ValType val)
 template <typename KeyType, typename ValType>
 ValType WAVLTree<KeyType, ValType>::find(const KeyType& key)
 {
-  node* leaf = root;
-  while (leaf->k != key)
-  {
-    if (leaf->k > key)
-      leaf = leaf->left;
-    else
-      leaf = leaf->right;
-
-    if (leaf == nullptr)
-      return -999;
-  }
-	return leaf->v;
+  node* leaf = find_node(key);
+  if (leaf)
+    return leaf->v;
+  else
+    return ValType();
 }
 template <typename KeyType, typename ValType>
 int WAVLTree<KeyType, ValType>::getSize()
@@ -104,18 +99,33 @@ int WAVLTree<KeyType, ValType>::getHeight()
 template <typename KeyType, typename ValType>
 int WAVLTree<KeyType, ValType>::getRank(const KeyType& key)
 {
+  node* leaf = find_node(key);
+  if (leaf)
+    return leaf->rank;
+  else
+    return -999;
+}
+
+template<typename KeyType, typename ValType>
+auto WAVLTree<KeyType, ValType>::find_node(const KeyType& key)
+{
   node* leaf = root;
-  while (leaf->k != key)
+  
+  while (leaf && leaf->k != key)
   {
     if (leaf->k > key)
       leaf = leaf->left;
     else
       leaf = leaf->right;
-
-    if (leaf == nullptr)
-      return -999;
   }
-  return leaf->rank;
+  return leaf;
+}
+
+template<typename KeyType, typename ValType>
+void WAVLTree<KeyType, ValType>::setValue(KeyType key, const ValType val)
+{
+  node* n = find_node(key);
+  n->v = val;
 }
 
 // add definitions for any public/private members if needed
