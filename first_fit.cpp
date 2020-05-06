@@ -1,8 +1,29 @@
 #include <vector>
-#include <algorithm>
 #include "project2.h"
 #include "WAVLTree.h"
-#include <iostream>
+//#include <iostream>
+
+//// FOR DEBUG
+//void print_children(WAVLTree<int, std::pair<double, double>>::node* n)
+//{
+//  if (n->left)
+//  {
+//    std::cout << n->k << "(" << n->rank << ")'s left: " << n->left->k << "(" << n->left->rank << ")\t" <<
+//      "first: " << n->left->v.first << "\tsecond: " << n->left->v.second << std::endl;
+//    print_children(n->left);
+//  }
+//  if (n->right)
+//  {
+//    std::cout << n->k << "(" << n->rank << ")'s right: " << n->right->k << "(" << n->right->rank << ")\t" <<
+//      "first: " << n->right->v.first << "\tsecond: " << n->right->v.second << std::endl;
+//    print_children(n->right);
+//  }
+//}
+
+bool double_equals(double a, double b, double epsilon = 0.001)
+{
+  return std::abs(a - b) < epsilon;
+}
 
 double get_largest_rc(WAVLTree<int, std::pair<double, double>>& binTree, const int bin, const double rc)
 {
@@ -32,44 +53,66 @@ int get_bin_number(WAVLTree<int, std::pair<double, double>>::node* node, double 
   int bin = -1;
   if (!node)
     return -1;
-
-  if (node->v.second >= item)
+  //std::cout << "First: " << node->v.first << "\tSecond: " << node->v.second << std::endl;
+  if (node->v.second > item || double_equals(node->v.second, item))
   {
     bin = get_bin_number(node->left, item);
-    if (bin == -1 && node->v.first >= item)
+    //std::cout << "BIN: " << bin << std::endl;
+    if (bin == -1 && (node->v.first > item || double_equals(node->v.first, item)))
+    {
       return node->k;
+    }
+      
     else if (bin == -1 && node->v.first < item)
       bin = get_bin_number(node->right, item);
     
   }
+  // else
   return bin;
+}
+
+double getLargestChildRC(WAVLTree<int, std::pair<double, double>>::node* n)
+{
+  double left = 0, right = 0;
+  if(n->left)
+    left = n->left->v.second;
+  if(n->right)
+    right = n->right->v.second;
+  if (left > right || double_equals(left, right))
+    return left;
+  else
+    return right;
 }
 
 void updateLargestRCs(WAVLTree<int, std::pair<double, double>>::node* n)
 {
   while (n->parent)
   {
-    if (n->parent->v.second > n->v.second)
+    // 1) Matching LRCs after rotation
+    // After left rotation (left node's lrc needs to be updated)
+    if (n->parent->left && double_equals(n->parent->left->v.second, n->parent->v.first))
     {
-      if (n->parent->v.second == n->parent->left->v.second
-        || n->parent->v.second == n->parent->right->v.second)
-        return;
-      else
-      {
-        if (n->parent->v.first > n->v.second)
-          n->parent->v.second = n->parent->v.first;
-        else
-          n->parent->v.second = n->v.second;
-        n = n->parent;
-      }
+      double temp = getLargestChildRC(n->parent->left);
+      if (n->parent->v.first > temp || double_equals(n->parent->v.first, temp))
+        temp = n->parent->v.first;
+      n->parent->left->v.second = temp;
     }
-    else if (n->parent->v.second < n->v.second)
+
+    // After right rotation (right node's lrc needs to be updated)
+    if (n->parent->right && double_equals(n->parent->right->v.second, n->parent->v.first))
     {
-      n->parent->v.second = n->v.second;
-      n = n->parent;
+      double temp = getLargestChildRC(n->parent->right);
+      if (n->parent->v.first > temp || double_equals(n->parent->v.first, temp))
+        temp = n->parent->v.first;
+      n->parent->right->v.second = temp;
     }
-    else
-      return;
+
+    // 2) update parent's LRC
+    double temp = getLargestChildRC(n->parent);
+    if (n->parent->v.first > temp || double_equals(n->parent->v.first, temp))
+      temp = n->parent->v.first;
+    n->parent->v.second = temp;
+    n = n->parent;
   }
 }
 
@@ -84,7 +127,12 @@ void first_fit(const std::vector<double>& items, std::vector<int>& assignment, s
     double rc;
     int bin=-1;
     if (binTree.root)
+    {
+      //std::cout << "------------------< " << item << " >-------------------" << std::endl;
       bin = get_bin_number(binTree.root, item);
+    }
+      
+    //std::cout << "FINAL BIN: "<<bin << std::endl;
 
     double largest_rc = binTree.find(bin).second;
 
@@ -104,13 +152,34 @@ void first_fit(const std::vector<double>& items, std::vector<int>& assignment, s
       // if rc and lrc are same,
       // compare node->left and right, and get the largest_rc
       // then update both rc and largest_rc of the bin
-      if (binTree.find(bin).first == largest_rc)
+      if (double_equals(binTree.find(bin).first, largest_rc))
         largest_rc = get_largest_rc(binTree, bin, rc);
       
       binTree.setValue(bin, { rc, largest_rc });
     }
     // update values of all parent nodes
+    //std::cout << bin << std::endl;
     updateLargestRCs(binTree.find_node(bin));
     assignment[i] = bin;
+
+    //std::cout << binTree.root->k << "(" << binTree.root->rank << ")\t" <<
+    //  "first: " << binTree.root->v.first << "\tsecond: " << binTree.root->v.second << std::endl;
+    //print_children(binTree.root);
   }
+
+  //// For Debug
+  //std::cout << "================================================" << std::endl;
+  //std::cout << "bin#: ";
+  //for (int x : assignment)
+  //{
+  //  std::cout << x << " ";
+  //}
+  //std::cout << std::endl;
+  //std::cout << "free: ";
+  //for (double x : free_space)
+  //{
+  //  std::cout << x << " ";
+  //}
+  //std::cout << std::endl;
+  //std::cout << "================================================" << std::endl;
 }

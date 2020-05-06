@@ -2,7 +2,8 @@
 #define MERGE_SORT_H
 #include <vector>
 
-void merge(std::vector<int>& left, std::vector<int>& right, std::vector<int>& nums)
+template <typename type>
+void merge(std::vector<type>& left, std::vector<type>& right, std::vector<type>& nums)
 {
   int lsize = left.size();
   int rsize = right.size();
@@ -37,10 +38,11 @@ void merge(std::vector<int>& left, std::vector<int>& right, std::vector<int>& nu
   }
 }
 
-void merge_sort(std::vector<int>& nums)
+template <typename type>
+void merge_sort(std::vector<type>& nums)
 {
   int size = nums.size();
-  std::vector<int> left, right, result;
+  std::vector<type> left, right, result;
 
   if (size > 1)
   {
