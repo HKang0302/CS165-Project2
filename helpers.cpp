@@ -1,6 +1,5 @@
-#ifndef MERGE_SORT_H
-#define MERGE_SORT_H
-#include <vector>
+#include "helpers.h"
+#include <cmath>
 
 template <typename type>
 void merge(std::vector<type>& left, std::vector<type>& right, std::vector<type>& nums)
@@ -39,8 +38,9 @@ void merge(std::vector<type>& left, std::vector<type>& right, std::vector<type>&
 }
 
 template <typename type>
-void merge_sort(std::vector<type>& nums)
+std::vector<type> merge_sort(const std::vector<type>& nums)
 {
+  std::vector<type> temp = nums;
   int size = nums.size();
   std::vector<type> left, right, result;
 
@@ -62,4 +62,9 @@ void merge_sort(std::vector<type>& nums)
     merge(left, right, nums);
 
   }
+}
+
+bool double_equals(double a, double b, double epsilon)
+{
+  return std::abs(a - b) < epsilon;
 }

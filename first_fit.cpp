@@ -1,6 +1,7 @@
 #include <vector>
 #include "project2.h"
 #include "WAVLTree.h"
+#include "helpers.h"
 //#include <iostream>
 
 //// FOR DEBUG
@@ -19,11 +20,6 @@
 //    print_children(n->right);
 //  }
 //}
-
-bool double_equals(double a, double b, double epsilon = 0.001)
-{
-  return std::abs(a - b) < epsilon;
-}
 
 double get_largest_rc(WAVLTree<int, std::pair<double, double>>& binTree, const int bin, const double rc)
 {
@@ -48,16 +44,14 @@ double get_largest_rc(WAVLTree<int, std::pair<double, double>>& binTree, const i
   return largest_rc;
 }
 
-int get_bin_number(WAVLTree<int, std::pair<double, double>>::node* node, double item)
+int get_bin_number(WAVLTree<int, std::pair<double, double>>::node* node, const double item)
 {
   int bin = -1;
   if (!node)
     return -1;
-  //std::cout << "First: " << node->v.first << "\tSecond: " << node->v.second << std::endl;
   if (node->v.second > item || double_equals(node->v.second, item))
   {
     bin = get_bin_number(node->left, item);
-    //std::cout << "BIN: " << bin << std::endl;
     if (bin == -1 && (node->v.first > item || double_equals(node->v.first, item)))
     {
       return node->k;
@@ -127,16 +121,11 @@ void first_fit(const std::vector<double>& items, std::vector<int>& assignment, s
     double rc;
     int bin=-1;
     if (binTree.root)
-    {
-      //std::cout << "------------------< " << item << " >-------------------" << std::endl;
       bin = get_bin_number(binTree.root, item);
-    }
-      
-    //std::cout << "FINAL BIN: "<<bin << std::endl;
 
     double largest_rc = binTree.find(bin).second;
 
-    if (bin==-1)
+    if (bin == -1)
     {
       bin = binTree.getSize() + 1;
       rc = 1 - item;
@@ -158,7 +147,6 @@ void first_fit(const std::vector<double>& items, std::vector<int>& assignment, s
       binTree.setValue(bin, { rc, largest_rc });
     }
     // update values of all parent nodes
-    //std::cout << bin << std::endl;
     updateLargestRCs(binTree.find_node(bin));
     assignment[i] = bin;
 

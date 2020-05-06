@@ -27,16 +27,22 @@ class WAVLTree {
       node* right = nullptr;
       node* parent = nullptr;
     };
+
     node* root;
-    auto find_node(const KeyType& key);
+
+    typedef node* Node;
+    auto find_node(const KeyType& key)-> Node;
     void setValue(KeyType key, const ValType val);
+    auto remove(WAVLTree<KeyType, ValType>::node* leaf, KeyType key)->Node;
 
 	private:
 		// define new private members
     int count = 0;
     void destroy_tree(node* leaf);
     void insert_node(node* leaf, node* newNode);
-    void balance_tree(node* leaf);
+    auto findSmallestNode(node* leaf)->Node;
+    void balance_insert(node* leaf);
+    void balance_remove(node* leaf);
     void left_rotation(node* leaf);
     void right_rotation(node* leaf);
     void rl_rotation(node* leaf);
@@ -107,7 +113,7 @@ int WAVLTree<KeyType, ValType>::getRank(const KeyType& key)
 }
 
 template<typename KeyType, typename ValType>
-auto WAVLTree<KeyType, ValType>::find_node(const KeyType& key)
+auto WAVLTree<KeyType, ValType>::find_node(const KeyType& key) -> Node
 {
   node* leaf = root;
   
@@ -126,6 +132,117 @@ void WAVLTree<KeyType, ValType>::setValue(KeyType key, const ValType val)
 {
   node* n = find_node(key);
   n->v = val;
+}
+
+template<typename KeyType, typename ValType>
+auto WAVLTree<KeyType, ValType>::remove(WAVLTree<KeyType, ValType>::node* leaf, KeyType key) -> Node
+{
+  node* parent;
+  if (leaf->k > key)
+    parent = remove(leaf->left, key);
+  else if (leaf->k < key)
+    parent = remove(leaf->right, key);
+  else
+  {
+    parent = leaf->parent;
+    node* lnode = leaf->left;
+    node* rnode = leaf->right;
+    // if the dNode has only one or no child
+    if (!lnode || !rnode)
+    {
+      node* child = lnode ? lnode : rnode;
+      // if there's a child
+      if (child)
+      {
+        // if dNode is not root
+        if (parent)
+        {
+          child->parent = parent;
+          if (parent->left == leaf)
+            parent->left = child;
+          else
+            parent->right = child;
+        }
+
+        // if dNode is root
+        else
+          root = child;
+      }
+      else if(parent)
+      {
+        if (parent->left == leaf)
+          parent->left = nullptr;
+        else
+          parent->right = nullptr;
+      }
+      delete leaf;
+    }
+
+    // if dNode has two children
+    else
+    {
+      // 1) get the node with the smallest key in the right subtree
+      node* nNode;
+      if (leaf->left->rank == 1)
+      {
+        nNode = leaf->left;
+        nNode->rank = leaf->rank;
+        nNode->right = leaf->right;
+        nNode->parent = leaf->parent;
+        if(leaf->parent)
+          leaf->parent->right = nNode;
+        leaf->right->parent = nNode;
+        parent = nNode;
+      }
+        
+      else
+      {
+        node* temp;
+        temp = findSmallestNode(rnode);
+        parent = temp->parent; // node for balancing
+
+        // 2) create a new node including temp info
+        //    place it to the leaf spot and delete leaf
+        nNode = new node;
+        nNode->k = temp->k;
+        nNode->v = temp->v;
+        nNode->rank = leaf->rank;
+        nNode->right = leaf->right;
+        nNode->parent = leaf->parent;
+        nNode->left = leaf->left;
+        leaf->right->parent = nNode;
+        leaf->left->parent = nNode;
+        parent->left = nullptr;
+        delete temp;
+      }
+
+      
+      if (leaf == root)
+      {
+        root = nNode;
+        while (parent)
+        {
+          balance_remove(parent);
+          parent = parent->parent;
+        }
+      }
+      delete leaf;     
+    }
+    this->count -= 1;
+  }
+  
+  // balance tree after remove
+  if (parent)
+  {
+    balance_remove(parent);
+    return parent->parent;
+  }
+
+  if (this->count == 0)
+    root = nullptr;
+
+  return root;
+  
 }
 
 // add definitions for any public/private members if needed
@@ -163,11 +280,20 @@ void WAVLTree<KeyType, ValType>::insert_node(node* leaf, node* newNode)
     else
       insert_node(leaf->left, newNode);
   }
-  balance_tree(leaf);
+  balance_insert(leaf);
 }
 
 template<typename KeyType, typename ValType>
-void WAVLTree<KeyType, ValType>::balance_tree(node* leaf)
+auto WAVLTree<KeyType, ValType>::findSmallestNode(node* leaf) -> Node
+{
+  while (leaf->left)
+    leaf = leaf->left;    
+  
+  return leaf;
+}
+
+template<typename KeyType, typename ValType>
+void WAVLTree<KeyType, ValType>::balance_insert(node* leaf)
 {
   // balance tree (if current node has a child node with the same rank)
   //  (1) 0,1 || 1,0 node => simply add 1 to the current node's rank
@@ -258,6 +384,62 @@ void WAVLTree<KeyType, ValType>::balance_tree(node* leaf)
       //std::cout << "ADD RANK" << std::endl;
       leaf->rank += 1;
     }
+  }
+}
+
+template<typename KeyType, typename ValType>
+void WAVLTree<KeyType, ValType>::balance_remove(node* leaf)
+{
+  node* lnode = leaf->left;
+  node* rnode = leaf->right;
+  int ldiff = 0, rdiff = 0;
+  if (lnode)
+    ldiff = leaf->rank - lnode->rank;
+  else
+    ldiff = leaf->rank;
+  if (rnode)
+    rdiff = leaf->rank - rnode->rank;
+  else
+    rdiff = leaf->rank;
+
+  // 2,2 || 2,3 || 3,2
+  if (ldiff > 1 && rdiff > 1)
+  {
+    leaf->rank -= 1;
+    return;
+  }
+
+  // 1,3
+  else if (ldiff == 1 && rdiff > 2)
+  {
+    int l_lrank = 0;
+    if (lnode->left)
+      l_lrank = lnode->left->rank;
+    // [1] Single rotation (right)
+    if (lnode->rank - l_lrank == 1)
+      right_rotation(leaf);
+
+    // [2] Double rotation (lr)
+    else
+      lr_rotation(leaf);
+
+    balance_remove(leaf);
+  }
+
+  // 3,1
+  else if (rdiff == 1 && ldiff > 2)
+  {
+    int r_rrank = 0;
+    if (rnode->right)
+      r_rrank = rnode->right->rank;
+    // [1] Single rotation (left)
+    if (rnode->rank - r_rrank == 1)
+      left_rotation(leaf);
+
+    // [2] Double rotation
+    else
+      rl_rotation(leaf);
+    balance_remove(leaf);
   }
 }
 

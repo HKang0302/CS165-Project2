@@ -1,5 +1,6 @@
 #include "WAVLTree.h"
 #include "project2.h"
+#include "helpers.h"
 #include <iostream>
 #include <utility>
 #include <string>
@@ -79,46 +80,54 @@ void print_parents(WAVLTree<int, char>::node* leaf)
 
 int main()
 {
-
+  /*
 	// ------------------
 	// WAVLTree tests
 	// ------------------
-	//std::cout << std::endl;
-	//std::cout << "testing WAVLTree (given)" << std::endl;
- // // define key/value pairs
- // WAVLTree<int, char> tree1;
- // std::vector<std::pair <int, char> > data1 = { {4, 'a'}, {5, 'b'}, {2, 'c'}, {1, 'd'} };
- // initializeTreeWithData(tree1, data1);
- // std::cout << "find(4): " << tree1.find(4) << ", Expected: a" << std::endl;
- // std::cout << "getSize(): " << tree1.getSize() << ", Expected: 4" << std::endl;
- // std::cout << "getHeight(): " << tree1.getHeight() << ", Expected: 3" << std::endl;
- // std::cout << "getRank(2): " << tree1.getRank(2) << ", Expected: 2" << std::endl;
- // std::cout << "getRank(1): " << tree1.getRank(1) << ", Expected: 1" << std::endl;
- // tree1.insert(0, 'e'); // single rotation
- // std::cout << "getSize(): " << tree1.getSize() << ", Expected: 5" << std::endl;
- // std::cout << "getHeight(): " << tree1.getHeight() << ", Expected: 3" << std::endl;
- // std::cout << "getRank(2): " << tree1.getRank(2) << ", Expected: 1" << std::endl;
- // std::cout << "getRank(1): " << tree1.getRank(1) << ", Expected: 2" << std::endl;
- // // add new tests
 
-	//// define key/value pairs
- // std::cout << std::endl;
- // std::cout << "testing WAVLTree (print)" << std::endl;
-	//WAVLTree<int, char> tree;
-	//std::vector<std::pair <int, char> > data = {{1, 'a'}, {2, 'b'}, {8, 'c'}, {4, 'd'},{3, 'a'},{6, 'a'} ,{9, 'a'} ,{5, 'a'} };
-	////initializeTreeWithData(tree, data);
- // for (auto const& item : data) {
- //   //std::cout << "===================" << item.first << "===========================" << std::endl;
- //   tree.insert(item.first, item.second);    
- //   //print_tree(tree.root);
- //   //std::cout << "===================" << item.first << "(PARENTS)===========================" << std::endl;
- //   //print_parents(tree.root);
- // }
- // std::cout << "=====================<FINAL>===========================" << std::endl;
- // print_tree(tree.root);
- // std::cout << "==================================================" << std::endl;
- // 
-	//// add new tests
+	// define key/value pairs
+  std::cout << std::endl;
+  std::cout << "testing WAVLTree (print)" << std::endl;
+	WAVLTree<int, char> tree;
+	std::vector<std::pair <int, char> > data = {{1, 'a'}, {2, 'b'}, {8, 'c'}, {4, 'd'},{3, 'a'},{6, 'a'} ,{9, 'a'} ,{5, 'a'} };
+	//initializeTreeWithData(tree, data);
+  for (auto const& item : data) {
+    //std::cout << "===================" << item.first << "===========================" << std::endl;
+    tree.insert(item.first, item.second);    
+    //print_tree(tree.root);
+    //std::cout << "===================" << item.first << "(PARENTS)===========================" << std::endl;
+    //print_parents(tree.root);
+  }
+  std::cout << "=====================<After insertion>===========================" << std::endl;
+  print_tree(tree.root);
+  //
+  
+  std::cout << "=====================<After Deletion>===========================" << std::endl;
+  tree.remove(tree.root, 4);
+  print_tree(tree.root);
+  std::cout << "===========================================================" << std::endl;
+  tree.remove(tree.root, 3);
+  print_tree(tree.root);
+  std::cout << "===========================================================" << std::endl;
+  tree.remove(tree.root, 8);  
+  print_tree(tree.root);
+  std::cout << "===========================================================" << std::endl;
+  tree.remove(tree.root, 9);
+  print_tree(tree.root);
+  std::cout << "===========================================================" << std::endl;
+  tree.remove(tree.root, 1);
+  print_tree(tree.root);
+  std::cout << "===========================================================" << std::endl;
+  tree.remove(tree.root, 5);
+  print_tree(tree.root);
+  std::cout << "===========================================================" << std::endl;
+  tree.remove(tree.root, 6);
+  print_tree(tree.root);
+  std::cout << "===========================================================" << std::endl;
+  tree.remove(tree.root, 2);
+  print_tree(tree.root);
+  std::cout << "===========================================================" << std::endl;
+  */
 
 
 	// ------------------
@@ -154,6 +163,7 @@ int main()
 	//expected_result = {items, {1, 2, 3, 4, 3, 2, 1, 4}, {0.0, 0.0, 0.0, 0.4}};
 	//testAlgorithm(test0, expected_result, best_fit_decreasing, "best_fit_decreasing");
 
+  
   // ----------------------------------test 1 ----------------------------------
   std::cout << std::endl;
   std::cout << "test 1" << std::endl;
@@ -175,15 +185,15 @@ int main()
   //expected_result = { items, {1, 2, 3, 4, 3, 2, 1, 4}, {0.0, 0.0, 0.0, 0.4} };
   //testAlgorithm(test1, expected_result, first_fit_decreasing, "first_fit_decreasing");
 
-  //// best_fit
-  //expected_result = { items, {1, 1, 2, 2, 3, 2, 4, 4}, {0.1, 0.0, 0.3, 0.0} };
-  //testAlgorithm(test1, expected_result, best_fit, "best_fit");
+  // best_fit
+  expected_result = { items, {1, 1, 2, 2, 3, 2, 4, 4}, {0.1, 0.0, 0.3, 0.0} };
+  testAlgorithm(test1, expected_result, best_fit, "best_fit");
 
   //// best_fit_decreasing
   //expected_result = { items, {1, 2, 3, 4, 3, 2, 1, 4}, {0.0, 0.0, 0.0, 0.4} };
   //testAlgorithm(test1, expected_result, best_fit_decreasing, "best_fit_decreasing");
 
-
+  /*
 	// ----------------------------------test 2 ----------------------------------
 	std::cout << std::endl;
 	std::cout << "test 2" << std::endl; 
@@ -264,6 +274,7 @@ int main()
 	// best_fit_decreasing
 	//expected_result = {items, {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 4, 2, 3, 5, 3, 5, 5, 1, 5}, {0.13, 0.01, 0.02, 0, 0, 0, 0, 0}};
 	//testAlgorithm(test4, expected_result, best_fit_decreasing, "best_fit_decreasing");
+  */
 	return 0;
 }
 
