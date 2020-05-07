@@ -181,19 +181,19 @@ int main()
   expected_result = { items, {1, 1, 2, 2, 3, 2, 4, 4}, {0.1, 0.0, 0.3, 0.0} };
   testAlgorithm(test1, expected_result, first_fit, "first_fit");
 
-  //// first_fit_decreasing
-  //expected_result = { items, {1, 2, 3, 4, 3, 2, 1, 4}, {0.0, 0.0, 0.0, 0.4} };
-  //testAlgorithm(test1, expected_result, first_fit_decreasing, "first_fit_decreasing");
+  // first_fit_decreasing
+  expected_result = { items, {1, 2, 3, 4, 3, 2, 1, 4}, {0.0, 0.0, 0.0, 0.4} };
+  testAlgorithm(test1, expected_result, first_fit_decreasing, "first_fit_decreasing");
 
   // best_fit
   expected_result = { items, {1, 1, 2, 2, 3, 2, 4, 4}, {0.1, 0.0, 0.3, 0.0} };
   testAlgorithm(test1, expected_result, best_fit, "best_fit");
 
-  //// best_fit_decreasing
-  //expected_result = { items, {1, 2, 3, 4, 3, 2, 1, 4}, {0.0, 0.0, 0.0, 0.4} };
-  //testAlgorithm(test1, expected_result, best_fit_decreasing, "best_fit_decreasing");
+  // best_fit_decreasing
+  expected_result = { items, {1, 2, 3, 4, 3, 2, 1, 4}, {0.0, 0.0, 0.0, 0.4} };
+  testAlgorithm(test1, expected_result, best_fit_decreasing, "best_fit_decreasing");
 
-  /*
+  
 	// ----------------------------------test 2 ----------------------------------
 	std::cout << std::endl;
 	std::cout << "test 2" << std::endl; 
@@ -209,17 +209,17 @@ int main()
 	expected_result = {items, {1, 2, 3, 1, 1, 4, 4, 5, 1, 6, 2, 5}, {0, 0.09, 0.05, 0.01, 0.1, 0.62}};
 	testAlgorithm(test2, expected_result, first_fit, "first_fit"); 
 
-	// first_fit_decreasing
-	//expected_result = {items, {1, 2, 3, 4, 5, 5, 6, 4, 2, 1, 3, 3}, {0, 0, 0.14, 0.1, 0.01, 0.62}};
-	//testAlgorithm(test2, expected_result, first_fit_decreasing, "first_fit_decreasing"); 
+	 //first_fit_decreasing
+	expected_result = {items, {1, 2, 3, 4, 5, 5, 6, 4, 2, 1, 3, 3}, {0, 0, 0.14, 0.1, 0.01, 0.62}};
+	testAlgorithm(test2, expected_result, first_fit_decreasing, "first_fit_decreasing"); 
 
 	// best_fit
-	//expected_result = {items, {1, 2, 3, 2, 3, 4, 4, 5, 1, 6, 1, 5}, {0.14, 0, 0, 0.01, 0.1, 0.62}};
-	//testAlgorithm(test2, expected_result, best_fit, "best_fit"); 
+	expected_result = {items, {1, 2, 3, 2, 3, 4, 4, 5, 1, 6, 1, 5}, {0.14, 0, 0, 0.01, 0.1, 0.62}};
+	testAlgorithm(test2, expected_result, best_fit, "best_fit"); 
 
 	// best_fit_decreasing
-	//expected_result = {items, {1, 2, 3, 4, 5, 5, 6, 4, 2, 1, 4, 4}, {0, 0, 0.21, 0.03, 0.01, 0.62}};
-	//testAlgorithm(test2, expected_result, best_fit_decreasing, "best_fit_decreasing");
+	expected_result = {items, {1, 2, 3, 4, 5, 5, 6, 4, 2, 1, 4, 4}, {0, 0, 0.21, 0.03, 0.01, 0.62}};
+	testAlgorithm(test2, expected_result, best_fit_decreasing, "best_fit_decreasing");
 
 	// ----------------------------------test 3 ----------------------------------
 	std::cout << std::endl;
@@ -237,16 +237,16 @@ int main()
 	testAlgorithm(test3, expected_result, first_fit, "first_fit"); 
 
 	// first_fit_decreasing
-	//expected_result = {items, {1, 2, 3, 3, 4, 1, 2}, {0, 0.33, 0.03, 0.58}};
-	//testAlgorithm(test3, expected_result, first_fit_decreasing, "first_fit_decreasing"); 
+	expected_result = {items, {1, 2, 3, 3, 4, 1, 2}, {0, 0.33, 0.03, 0.58}};
+	testAlgorithm(test3, expected_result, first_fit_decreasing, "first_fit_decreasing"); 
 
 	// best_fit
-	//expected_result = {items, {1, 2, 2, 1, 3, 1, 4}, {0.12, 0, 0.46, 0.36}};
-	//testAlgorithm(test3, expected_result, best_fit, "best_fit"); 
+	expected_result = {items, {1, 2, 2, 1, 3, 1, 4}, {0.12, 0, 0.46, 0.36}};
+	testAlgorithm(test3, expected_result, best_fit, "best_fit"); 
 
 	// best_fit_decreasing
-	//expected_result = {items, {1, 2, 3, 3, 4, 1, 3}, {0, 0.36, 0, 0.58}};
-	//testAlgorithm(test3, expected_result, best_fit_decreasing, "best_fit_decreasing");
+	expected_result = {items, {1, 2, 3, 3, 4, 1, 3}, {0, 0.36, 0, 0.58}};
+	testAlgorithm(test3, expected_result, best_fit_decreasing, "best_fit_decreasing");
 
 	// ----------------------------------test 4----------------------------------
 	std::cout << std::endl;
@@ -264,17 +264,17 @@ int main()
 	testAlgorithm(test4, expected_result, first_fit, "first_fit"); 
 
 	// first_fit_decreasing
-	//expected_result = {items, {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 4, 2, 3, 5, 1, 1, 3, 1, 3}, {0, 0.01, 0.01, 0, 0.14, 0, 0, 0}};
-	//testAlgorithm(test4, expected_result, first_fit_decreasing, "first_fit_decreasing"); 
+	expected_result = {items, {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 4, 2, 3, 5, 1, 1, 3, 1, 3}, {0, 0.01, 0.01, 0, 0.14, 0, 0, 0}};
+	testAlgorithm(test4, expected_result, first_fit_decreasing, "first_fit_decreasing"); 
 
 	// best_fit
-	//expected_result = {items, {1, 2, 1, 3, 2, 2, 4, 5, 6, 2, 6, 7, 5, 7, 4, 3, 4, 8, 9, 4}, {0, 0.01, 0.18, 0.01, 0, 0, 0.02, 0.37, 0.57}};
-	//testAlgorithm(test4, expected_result, best_fit, "best_fit"); 
+	expected_result = {items, {1, 2, 1, 3, 2, 2, 4, 5, 6, 2, 6, 7, 5, 7, 4, 3, 4, 8, 9, 4}, {0, 0.01, 0.18, 0.01, 0, 0, 0.02, 0.37, 0.57}};
+	testAlgorithm(test4, expected_result, best_fit, "best_fit"); 
 
 	// best_fit_decreasing
-	//expected_result = {items, {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 4, 2, 3, 5, 3, 5, 5, 1, 5}, {0.13, 0.01, 0.02, 0, 0, 0, 0, 0}};
-	//testAlgorithm(test4, expected_result, best_fit_decreasing, "best_fit_decreasing");
-  */
+	expected_result = {items, {1, 2, 3, 4, 5, 6, 7, 8, 8, 7, 6, 4, 2, 3, 5, 3, 5, 5, 1, 5}, {0.13, 0.01, 0.02, 0, 0, 0, 0, 0}};
+	testAlgorithm(test4, expected_result, best_fit_decreasing, "best_fit_decreasing");
+  
 	return 0;
 }
 
