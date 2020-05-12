@@ -67,7 +67,7 @@ void best_fit(const std::vector<double>& items, std::vector<int>& assignment, st
     double rc = -1;
     int bin = -1;
     std::vector<int> bins;
-
+    //std::cout << "----------<" << item << ">-------------" << std::endl;
     if (rcTree.root)
       rc = find_key(rcTree.root, item);
     if (rc == -1)
@@ -96,6 +96,7 @@ void best_fit(const std::vector<double>& items, std::vector<int>& assignment, st
         rcTree.remove(rcTree.root, rc);
       }
 
+      
       //std::cout << "===============AFTER REMOVE============" << std::endl;
       //printTree(rcTree.root);
 
@@ -121,24 +122,25 @@ void best_fit(const std::vector<double>& items, std::vector<int>& assignment, st
       // 3) if new rc exists in the tree, add the bin# into the val vector
       //    -- if not, insert a new bin
     }
-    //std::cout << "----------<" << item << ">-------------" << std::endl;
+
+    //std::cout << "===============AFTER insertion============" << std::endl;
     //printTree(rcTree.root);
 
     assignment[i] = bin;
   }
-  // For Debug
-  std::cout << "================================================" << std::endl;
-  std::cout << "bin#: ";
-  for (int x : assignment)
-  {
-    std::cout << x << " ";
-  }
-  std::cout << std::endl;
-  std::cout << "free: ";
-  for (double x : free_space)
-  {
-    std::cout << x << " ";
-  }
-  std::cout << std::endl;
-  std::cout << "================================================" << std::endl;
+  //// For Debug
+  //std::cout << "================================================" << std::endl;
+  //std::cout << "bin#: ";
+  //for (int x : assignment)
+  //{
+  //  std::cout << x << " ";
+  //}
+  //std::cout << std::endl;
+  //std::cout << "free: ";
+  //for (double x : free_space)
+  //{
+  //  std::cout << x << " ";
+  //}
+  //std::cout << std::endl;
+  //std::cout << "================================================" << std::endl;
 }

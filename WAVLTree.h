@@ -220,7 +220,7 @@ auto WAVLTree<KeyType, ValType>::remove(WAVLTree<KeyType, ValType>::node* leaf, 
       }
 
       // if dNode is root
-      if (!leaf->parent)
+      if (leaf->rank == root->rank)
         root = newNode;
 
       // if dNode has a parent
@@ -233,7 +233,11 @@ auto WAVLTree<KeyType, ValType>::remove(WAVLTree<KeyType, ValType>::node* leaf, 
           parent->right = newNode;
       }
 
-      parent = temp->parent;
+      if (temp->parent == leaf)
+        parent = leaf->parent;
+      else
+        parent = temp->parent;
+
       delete temp;
            
     }
@@ -244,18 +248,14 @@ auto WAVLTree<KeyType, ValType>::remove(WAVLTree<KeyType, ValType>::node* leaf, 
   // balance tree after remove
   if (parent)
   {
-    std::cout << "KEY1: " << parent->k << std::endl;
     balance_remove(parent);
-    //while (parent && parent->rank < leaf_rank)
-    //{
-    //  std::cout << "KEY2: " << parent->k << std::endl;
-    //  balance_remove(parent);
-    //  parent = parent->parent;
-    //}
+    while (parent->rank < leaf_rank)
+    {
+      balance_remove(parent);
+      parent = parent->parent;
+    }
     if (leaf_rank == root->rank)
     {
-      if (parent)
-        std::cout << "KEY3: " << parent->k << std::endl;
       balance_remove(parent);
     }
       
@@ -425,7 +425,7 @@ void WAVLTree<KeyType, ValType>::balance_remove(node* leaf)
     rdiff = leaf->rank - rnode->rank;
   else
     rdiff = leaf->rank;
-
+  //std::cout << "KEY: " << leaf->k << "\tldiff: "<<ldiff << "\trdiff: " << rdiff<< std::endl;
   // 2,2 || 2,3 || 3,2
   if (ldiff > 1 && rdiff > 1)
   {
@@ -442,11 +442,15 @@ void WAVLTree<KeyType, ValType>::balance_remove(node* leaf)
       l_rrank -= lnode->right->rank;
 
     // [1] Double or Triple rotation
-    if (l_lrank == 2 && l_rrank > 1)
+    if (l_lrank == 2 && l_rrank == 1)
     {
       // Double
-      if (leaf->parent->left == leaf)
-        lr_rotation(lnode);
+      if (!leaf->parent || leaf->parent->left == leaf)
+      {
+        left_rotation(lnode);
+        right_rotation(leaf);
+      }
+        
 
       // Triple
       else
@@ -474,11 +478,14 @@ void WAVLTree<KeyType, ValType>::balance_remove(node* leaf)
       r_rrank -= rnode->right->rank;
 
     // [1] Double or Triple rotation
-    if (r_lrank == 1 && r_rrank > 2)
+    if (r_lrank == 1 && r_rrank == 2)
     {
       // Double
-      if (leaf->parent->right == leaf)
-        rl_rotation(rnode);
+      if (!leaf->parent || leaf->parent->right == leaf)
+      {
+        right_rotation(rnode);
+        left_rotation(leaf);
+      }
 
       // Triple
       else
